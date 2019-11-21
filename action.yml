@@ -1,0 +1,34 @@
+# action.yml
+name: 'Mesh Release Action'
+description: 'Update mesh app'
+inputs:
+  app:
+    description: 'App name'
+    required: true
+  version:
+    description: 'App version'
+    required: true
+  token:
+    description: 'GitHub Private Access Token'
+    required: true
+  repo:
+    description: 'App config repository (chart)'
+    required: false
+    default: github.com/brudi/catalog-solutions.git
+  path:
+    description: 'Path to app chart in repo'
+    required: false
+  values:
+    description: 'Values file'
+    required: false
+    default: 'values.yaml'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.app }}
+    - ${{ inputs.version }}
+    - ${{ inputs.token }}
+    - ${{ inputs.repo }}
+    - ${{ inputs.path }}
+    - ${{ inputs.values }}
