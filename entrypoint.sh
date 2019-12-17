@@ -31,5 +31,5 @@ yq write --inplace -- $VALUES $APP.tag $VERSION
 
 # commit and push
 git add $VALUES
-git commit -m "chore(object-sites): release $APP $VERSION"
+git commit -m "chore($APP): release $APP $VERSION"
 git push origin master
