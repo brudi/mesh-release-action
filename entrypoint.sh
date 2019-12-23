@@ -6,6 +6,7 @@ TOKEN=${3}
 REPO=${4}
 REPO_PATH=${5}
 VALUES=${6}
+TAG_PATH=${7:-$APP.tag}
 
 echo "Release Mesh app '$APP' ($VERSION) in $REPO"
 echo "using values file $VALUES at $PATH"
@@ -27,7 +28,7 @@ else
 fi
 
 # replace version in values file
-yq write --inplace -- $VALUES $APP.tag $VERSION
+yq write --inplace -- $VALUES $TAG_PATH $VERSION
 
 # commit and push
 git add $VALUES
