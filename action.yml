@@ -14,7 +14,7 @@ inputs:
   repo:
     description: 'App configuration repository'
     required: false
-    default: github.com/brudi/catalog-solutions.git
+    default: github.com/brudi/catalog-mesh.git
   ref:
     description: 'Git ref to checkout'
     required: false

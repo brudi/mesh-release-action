@@ -33,7 +33,7 @@ then
   # mesh convention: expect apps in 'apps' folder
   REPO_PATH="apps/${APP}"
   
-  if [! -d "$REPO_PATH" ] && [ "$is_fallback_app_name" = true ]]; then
+  if [[! -d "$REPO_PATH" ] && [ "$is_fallback_app_name" = true ]]; then
     # when using fallback app name but the 'apps' folder 
     # does not exist, we fallback to the 'base' directory. 
     #
