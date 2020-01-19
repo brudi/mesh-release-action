@@ -46,7 +46,7 @@ echo "release Mesh app '$APP' ($VERSION) in $REPO"
 echo "updating $TAG_PATH in $KUSTOMIZATION at $REPO_PATH"
 
 # create app config directory if it doesn't exist yet
-if [[! -d "$REPO_PATH" ]]; then
+if [[ ! -d "$REPO_PATH" ]]; then
   mkdir -p $REPO_PATH
 fi
 
