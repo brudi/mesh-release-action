@@ -2,15 +2,15 @@
 name: 'Mesh Release Action'
 description: 'Update mesh app'
 inputs:
-  app:
-    description: 'App name'
-    required: true
   version:
     description: 'App version'
     required: true
   token:
     description: 'GitHub Private Access Token'
     required: true
+  app:
+    description: 'App name (defaults to current folder name)'
+    required: false
   repo:
     description: 'App configuration repository'
     required: false
@@ -18,7 +18,7 @@ inputs:
   ref:
     description: 'Git ref to checkout'
     required: false
-    default: '.'
+    default: 'master'
   path:
     description: 'Path to app configuration in repo'
     required: false
