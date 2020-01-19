@@ -12,18 +12,22 @@ inputs:
     description: 'GitHub Private Access Token'
     required: true
   repo:
-    description: 'App config repository (chart)'
+    description: 'App configuration repository'
     required: false
     default: github.com/brudi/catalog-solutions.git
+  ref:
+    description: 'Git ref to checkout'
+    required: false
+    default: '.'
   path:
-    description: 'Path to app chart in repo'
+    description: 'Path to app configuration in repo'
     required: false
-  values:
-    description: 'Values file'
+  kustimization:
+    description: 'Kustomization file'
     required: false
-    default: 'values.yaml'
+    default: 'kustomization.yaml'
   tag-path:
-    description: 'Tag value property name'
+    description: 'Explicit path to image tag value to replace'
     required: false
 runs:
   using: 'docker'
@@ -33,6 +37,7 @@ runs:
     - ${{ inputs.version }}
     - ${{ inputs.token }}
     - ${{ inputs.repo }}
+    - ${{ inputs.ref }}
     - ${{ inputs.path }}
-    - ${{ inputs.values }}
+    - ${{ inputs.kustomization }}
     - ${{ inputs.tag-path }}
