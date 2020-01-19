@@ -22,7 +22,7 @@ fi
 # clone and configure the catalog Git repository
 git clone "https://brudicloud:${TOKEN}@${REPO}" catalog
 cd catalog
-git checkout ${BRANCH}
+git checkout ${REF}
 git config --local user.email cloud@brudi.com
 git config --local user.name Mesh
 
@@ -60,4 +60,4 @@ test $? -eq 0 || exit 1
 # commit and push
 git add $KUSTOMIZATION
 git commit -m "chore($APP): release $APP $VERSION"
-git push origin ${BRANCH}
+git push origin ${REF}
