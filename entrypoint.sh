@@ -7,7 +7,7 @@ REPO=${4}
 REF=${5}
 REPO_PATH=${6-$APP}
 KUSTOMIZATION=${7}
-TAG_PATH=${8:-$FILE.newTag}
+TAG_PATH=${8}
 
 is_fallback_app_name=false
 # default
@@ -40,7 +40,6 @@ then
     REPO_PATH='base';
   fi
 fi
-
 
 echo "release Mesh app '$APP' ($VERSION) in $REPO"
 echo "updating $TAG_PATH in $KUSTOMIZATION at $REPO_PATH"

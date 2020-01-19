@@ -27,8 +27,9 @@ inputs:
     required: false
     default: 'kustomization.yaml'
   tag-path:
-    description: 'Explicit path to image tag value to replace'
+    description: 'Explicit path to image tag value'
     required: false
+    default: 'images[0].newTag'
 runs:
   using: 'docker'
   image: 'Dockerfile'
