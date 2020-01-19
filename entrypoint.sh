@@ -32,6 +32,7 @@ if [ -z "$REPO_PATH" ]
 then
   # mesh convention: expect apps in 'apps' folder
   REPO_PATH="apps/${APP}"
+  
   if [[ ! -d "$REPO_PATH" ]] && [ "$is_fallback_app_name" = true ] ; then    # when using fallback app name but the 'apps' folder 
     # does not exist, we fallback to the 'base' directory. 
     #
@@ -45,7 +46,7 @@ echo "release Mesh app '$APP' ($VERSION) in $REPO"
 echo "updating $TAG_PATH in $KUSTOMIZATION at $REPO_PATH"
 
 # create app config directory if it doesn't exist yet
-if [! -d "$REPO_PATH" ]; then
+if [[! -d "$REPO_PATH" ]]; then
   mkdir -p $REPO_PATH
 fi
 
