@@ -56,6 +56,8 @@ cd $REPO_PATH
 # replace version in kustomization file
 yq write --inplace -- $KUSTOMIZATION $TAG_PATH $VERSION
 
+test $? -eq 0 || exit 1
+
 # commit and push
 git add $KUSTOMIZATION
 git commit -m "chore($APP): release $APP $VERSION"
