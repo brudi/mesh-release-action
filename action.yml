@@ -22,14 +22,15 @@ inputs:
   path:
     description: 'Path to app configuration in repo'
     required: false
-  kustomization:
-    description: 'Kustomization file'
+  image:
+    description: 'Path to docker repo image'
     required: false
-    default: 'kustomization.yaml'
-  tag-path:
-    description: 'Explicit path to image tag value'
+  imageBase:
+    description: 'Base path to docker repo images'
     required: false
-    default: 'images[0].newTag'
+  images:
+    description: 'Comma separated list of image names to replace'
+    required: false
 runs:
   using: 'docker'
   image: 'Dockerfile'
@@ -40,5 +41,6 @@ runs:
     - ${{ inputs.repo }}
     - ${{ inputs.ref }}
     - ${{ inputs.path }}
-    - ${{ inputs.kustomization }}
-    - ${{ inputs.tag-path }}
+    - ${{ inputs.image }}
+    - ${{ inputs.imageBase }}
+    - ${{ inputs.images }}

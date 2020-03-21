@@ -1,13 +1,18 @@
 #!/bin/sh -l
 
+. $(dirname "$0")/edit.sh 
+
 APP=${1}
 VERSION=${2}
 TOKEN=${3}
 REPO=${4}
 REF=${5}
 REPO_PATH=${6-$APP}
-KUSTOMIZATION=${7}
-TAG_PATH=${8}
+IMAGE=${7}
+IMAGE_BASE=${8}
+IMAGES=${9}
+
+COMMIT_MSG=`git log -1 --pretty=%B`
 
 is_fallback_app_name=false
 # default
@@ -17,7 +22,6 @@ then
   APP=${PWD##*/}
   echo "app param not defined. using current folder name ${APP}"
 fi
-
 
 # clone and configure the catalog Git repository
 git clone "https://brudicloud:${TOKEN}@${REPO}" catalog
@@ -42,22 +46,42 @@ then
 fi
 
 echo "release Mesh app '$APP' ($VERSION) in $REPO"
-echo "updating $TAG_PATH in $KUSTOMIZATION at $REPO_PATH"
+echo "-> $COMMIT_MSG"
 
 # create app config directory if it doesn't exist yet
 if [[ ! -d "$REPO_PATH" ]]; then
   mkdir -p $REPO_PATH
 fi
 
+# sync base config
+if [[ ! -d "$GITHUB_WORKSPACE/install" ]]; then
+  echo "syncing from apps install folder"
+  rsync -a $GITHUB_WORKSPACE/install/base $REPO_PATH/
+fi
+
 # change to desired app config directory
 cd $REPO_PATH
 
-# replace version in kustomization file
-yq write --inplace -- $KUSTOMIZATION $TAG_PATH $VERSION
+# edit image tags
+if [ ! -z "$IMAGES" ]; then
+  if [ -z "$IMAGE_BASE" ]; then
+    echo "ERROR: define the 'imageBase' when using 'images'!"
+    exit 1;
+  fi
+
+  echo "editing $IMAGES with base $IMAGE_BASE"
+  edit_all_images $IMAGE_BASE $IMAGES $VERSION
+
+elif [ ! -z "$IMAGE" ]; then
+  edit_image_tag $IMAGE $VERSION
+else
+  echo "ERROR: one of 'image' or 'images' must be defined"
+fi
+
 
 test $? -eq 0 || exit 1
 
 # commit and push
-git add $KUSTOMIZATION
-git commit -m "chore($APP): release $APP $VERSION"
+git add $REPO_PATH
+git commit -m "chore($APP): release $REF $VERSION" -m $COMMIT_MSG
 git push origin ${REF}
