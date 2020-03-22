@@ -5,7 +5,7 @@ RUN apk --no-cache add rsync git curl bash
 RUN curl -s "https://raw.githubusercontent.com/\
 kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
 
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-COPY edit.sh /usr/local/bin/edit.sh
+COPY entrypoint.sh /entrypoint.sh
+COPY edit.sh /edit.sh
 
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
