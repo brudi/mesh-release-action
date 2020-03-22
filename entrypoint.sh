@@ -66,7 +66,7 @@ cd $REPO_PATH
 
 # use overlay
 if [ ! -z "$OVERLAY" ]; then
-  echo "editing overlay kustomization at overlays/'$OVERLAY'"
+  echo "editing overlay kustomization at overlays/$OVERLAY"
   cd overlays/$OVERLAY
 else
   echo "editing base kustomization"
@@ -87,10 +87,11 @@ else
   echo "ERROR: one of 'image' or 'images' must be defined"
 fi
 
-
 test $? -eq 0 || exit 1
 
 # commit and push
 git add $REPO_PATH
-git commit -m "chore($APP): release $REF $VERSION" -m $COMMIT_MSG
+git commit -m "chore($APP): release $REF $VERSION" -m "$COMMIT_MSG"
 git push origin ${REF}
+
+test $? -eq 0 || exit 1
