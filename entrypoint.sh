@@ -1,6 +1,6 @@
-#!/bin/sh -l
+#!/bin/bash
 
-. $(dirname "$0")/edit.sh 
+. $(dirname "$0")/edit.sh
 
 APP=${1}
 VERSION=${2}

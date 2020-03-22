@@ -1,4 +1,4 @@
-#!/bin/sh -l
+#!/bin/bash
 
 edit_image_tag() {
   echo "kustomize image tag $1 ($2)"
