@@ -91,7 +91,11 @@ test $? -eq 0 || exit 1
 
 # commit and push
 git add $REPO_PATH
-git commit -m "chore($APP): release $REF $VERSION" -m "$COMMIT_MSG"
+git commit -F- <<EOF
+chore($APP): release $REF $VERSION
+
+$COMMIT_MSG
+EOF
 git push origin ${REF}
 
 test $? -eq 0 || exit 1
