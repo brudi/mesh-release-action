@@ -11,6 +11,7 @@ REPO_PATH=${6-$APP}
 IMAGE=${7}
 IMAGE_BASE=${8}
 IMAGES=${9}
+OVERLAY=${10}
 
 COMMIT_MSG=`git log -1 --pretty=%B`
 
@@ -63,16 +64,23 @@ fi
 # change to desired app config directory
 cd $REPO_PATH
 
+# use overlay
+if [ ! -z "$OVERLAY" ]; then
+  echo "editing overlay kustomization at overlays/'$OVERLAY'"
+  cd overlays/$OVERLAY
+else
+  echo "editing base kustomization"
+  cd base
+fi
+
 # edit image tags
 if [ ! -z "$IMAGES" ]; then
   if [ -z "$IMAGE_BASE" ]; then
     echo "ERROR: define the 'imageBase' when using 'images'!"
     exit 1;
   fi
-
   echo "editing $IMAGES with base $IMAGE_BASE"
   edit_all_images $IMAGE_BASE $IMAGES $VERSION
-
 elif [ ! -z "$IMAGE" ]; then
   edit_image_tag $IMAGE $VERSION
 else

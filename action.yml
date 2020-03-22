@@ -31,6 +31,9 @@ inputs:
   images:
     description: 'Comma separated list of image names to replace'
     required: false
+  overlay:
+    description: 'Specific overlay to release'
+    required: false
 runs:
   using: 'docker'
   image: 'Dockerfile'
@@ -44,3 +47,4 @@ runs:
     - ${{ inputs.image }}
     - ${{ inputs.imageBase }}
     - ${{ inputs.images }}
+    - ${{ inputs.overlay }}
