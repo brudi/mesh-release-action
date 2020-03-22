@@ -1,4 +1,4 @@
-#!/bin/sh -l
+#!/bin/bash
 
 . $(dirname "$0")/edit.sh 
 

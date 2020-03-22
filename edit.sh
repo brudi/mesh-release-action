@@ -1,4 +1,4 @@
-#!/bin/sh -l
+#!/bin/bash
 
 edit_image_tag() {
   echo "kustomize image tag $1 ($2)"
@@ -14,9 +14,7 @@ edit_all_images() {
         local image
         while read -d "$delimiter" image; do
           edit_image_tag "$repo$image" $version
-        done <<EOF
-$images
-EOF
+        done <<< "$images"
         edit_image_tag "$repo$image" $version
     fi
 }
