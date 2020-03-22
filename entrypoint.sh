@@ -87,9 +87,8 @@ fi
 
 test $? -eq 0 || exit 1
 
-cd $action_root
-
-# commit and push
+# commit and push catalog
+cd $action_root/catalog
 git add $REPO_PATH
 git commit -F- <<EOF
 chore($APP): release $REF $VERSION
