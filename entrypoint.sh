@@ -13,7 +13,8 @@ IMAGE_BASE=${8}
 IMAGES=${9}
 OVERLAY=${10}
 
-COMMIT_MSG=`git log -1 --pretty=%B`
+commit_msg=$(git log -1 --pretty=%B)
+action_root=$(pwd)
 
 is_fallback_app_name=false
 # default
@@ -47,7 +48,7 @@ then
 fi
 
 echo "release Mesh app '$APP' ($VERSION) in $REPO"
-echo "-> $COMMIT_MSG"
+echo "-> $commit_msg"
 
 # create app config directory if it doesn't exist yet
 if [[ ! -d "$REPO_PATH" ]]; then
@@ -62,15 +63,12 @@ if [[ ! -d "$GITHUB_WORKSPACE/install" ]]; then
 fi
 
 # change to desired app config directory
-cd $REPO_PATH
-
-# use overlay
 if [ ! -z "$OVERLAY" ]; then
   echo "editing overlay kustomization at overlays/$OVERLAY"
-  cd overlays/$OVERLAY
+  cd $REPO_PATH/overlays/$OVERLAY
 else
   echo "editing base kustomization"
-  cd base
+  cd $REPO_PATH/base
 fi
 
 # edit image tags
@@ -89,13 +87,13 @@ fi
 
 test $? -eq 0 || exit 1
 
+cd $action_root
+
 # commit and push
 git add $REPO_PATH
 git commit -F- <<EOF
 chore($APP): release $REF $VERSION
 
-$COMMIT_MSG
+$commit_msg
 EOF
 git push origin ${REF}
-
-test $? -eq 0 || exit 1
