@@ -56,7 +56,11 @@ if [[ ! -d "$REPO_PATH" ]]; then
 fi
 
 # sync base config
-if [[ -d "$GITHUB_WORKSPACE/$APP/install" ]]; then
+echo "workspace: $GITHUB_WORKSPACE ($RUNNER_WORKSPACE)"
+ls -l $GITHUB_WORKSPACE
+ls -l $RUNNER_WORKSPACE
+ls -l $RUNNER_WORKSPACE/$APP
+if [[ -d "$RUNNER_WORKSPACE/$APP/install" ]]; then
   echo "syncing from apps install folder"
   rsync -a $GITHUB_WORKSPACE/$APP/install/base $REPO_PATH/
   rsync -a $GITHUB_WORKSPACE/$APP/install/overlays $REPO_PATH/ 2>/dev/null
