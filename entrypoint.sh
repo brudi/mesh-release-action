@@ -57,17 +57,11 @@ fi
 
 # sync base config
 echo "workspace: $GITHUB_WORKSPACE -> $APP"
-ls -l $GITHUB_WORKSPACE
-echo "app:"
-ls -l $GITHUB_WORKSPACE/$APP
-echo "runner: $GITHUB_RUNNER:"
-echo "app:"
-ls -l $RUNNER_WORKSPACE
-ls -l $RUNNER_WORKSPACE/$APP
-if [[ -d "$GITHUB_WORKSPACE/$APP/install" ]]; then
+ls -l $GITHUB_WORKSPACE/install
+if [[ -d "$GITHUB_WORKSPACE/install" ]]; then
   echo "syncing from apps install folder"
-  rsync -a $GITHUB_WORKSPACE/$APP/install/base $REPO_PATH/
-  rsync -a $GITHUB_WORKSPACE/$APP/install/overlays $REPO_PATH/ 2>/dev/null
+  rsync -a $GITHUB_WORKSPACE/install/base $REPO_PATH/
+  rsync -a $GITHUB_WORKSPACE/install/overlays $REPO_PATH/ 2>/dev/null
 fi
 
 # change to desired app config directory
