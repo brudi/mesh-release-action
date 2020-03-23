@@ -56,6 +56,8 @@ if [[ ! -d "$REPO_PATH" ]]; then
 fi
 
 # sync base config
+echo "looking for app install folder"
+ls -l install
 if [[ ! -d "install" ]]; then
   echo "syncing from apps install folder"
   rsync -a ./install/base $REPO_PATH/
