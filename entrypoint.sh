@@ -56,8 +56,11 @@ if [[ ! -d "$REPO_PATH" ]]; then
 fi
 
 # sync base config
-echo "looking for app install folder"
-ls -l install
+echo "looking for app install folder ($HOME)"
+ls -l $HOME
+echo "workspace: $GIHTUB_WORKSPACE ($RUNNER_WORKSPACE)"
+ls -l $GIHTUB_WORKSPACE
+ls -l $RUNNER_WORKSPACE
 if [[ ! -d "install" ]]; then
   echo "syncing from apps install folder"
   rsync -a ./install/base $REPO_PATH/
