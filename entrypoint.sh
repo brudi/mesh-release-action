@@ -17,7 +17,7 @@ AMEND=${12-false}
 
 commit_msg=$(git log -1 --pretty=%B)
 action_root=$(pwd)
-install_folder$GITHUB_WORKSPACE/install
+install_folder=$GITHUB_WORKSPACE/install
 
 is_fallback_app_name=false
 # default
