@@ -34,6 +34,12 @@ inputs:
   overlay:
     description: 'Specific overlay to release'
     required: false
+  push:
+    description: 'Push the changes of the app repo itself. By default, changes are pushed to the `repo` only.'
+    required: false
+  amend:
+    description: 'Amend the app changes to the last commit. Creates a new commit by default. Only available when `push` is set to true.'
+    required: false
 runs:
   using: 'docker'
   image: 'Dockerfile'
@@ -48,3 +54,5 @@ runs:
     - ${{ inputs.imageBase }}
     - ${{ inputs.images }}
     - ${{ inputs.overlay }}
+    - ${{ inputs.push }}
+    - ${{ inputs.amend }}
