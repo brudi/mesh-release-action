@@ -14,6 +14,7 @@ IMAGES=${9}
 OVERLAY=${10}
 PUSH=${11-false}
 AMEND=${12-false}
+OVERLAY=${13}
 
 commit_msg=$(git log -1 --pretty=%B)
 action_root=$(pwd)
@@ -117,4 +118,11 @@ EOF
 
   popd
 
+  if [ ! -z "$MERGE" ]; then
+    pushd $GITHUB_WORKSPACE
+      git checkout $MERGE
+      git merge next
+      git push origin $MERGE
+    popd
+  fi
 fi

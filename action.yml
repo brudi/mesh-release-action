@@ -40,6 +40,9 @@ inputs:
   amend:
     description: 'Amend the app changes to the last commit. Creates a new commit by default. Only available when `push` is set to true.'
     required: false
+  merge:
+    description: 'Git ref used to merge after release. Does not merge by default.'
+    required: false
 runs:
   using: 'docker'
   image: 'Dockerfile'
@@ -56,3 +59,4 @@ runs:
     - ${{ inputs.overlay }}
     - ${{ inputs.push }}
     - ${{ inputs.amend }}
+    - ${{ inputs.merge }}
