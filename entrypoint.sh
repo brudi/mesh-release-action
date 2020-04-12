@@ -113,10 +113,11 @@ if [ "$PUSH" = true ]; then
   git config --local user.name Mesh
 
   git add .
-  
-  #if [ "$AMEND" = true ]; then
-  #  git commit --amend --no-edit --no-verify
-  #else
+
+  num_ahead=$(git rev-list --count next...origin/next)
+  if [[ "$AMEND" = true ]] && [ $num_ahead -gt 0 ]; then 
+    git commit --amend --no-edit --no-verify
+  else
     git commit -F- <<EOF
 chore($APP): release $VERSION
 
