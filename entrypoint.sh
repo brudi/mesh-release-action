@@ -118,7 +118,7 @@ if [ "$PUSH" = true ]; then
   git add .
 
   num_ahead=$(git rev-list --count next...origin/next)
-  if [[ "$AMEND" = true ]] && [ $num_ahead -gt 0 ]; then 
+  if [ "$AMEND" = true ] && [ $num_ahead -gt 0 ]; then 
     git commit --amend --no-edit --no-verify
   else
     git commit -F- <<EOF
@@ -126,7 +126,7 @@ chore($APP): release $VERSION
 
 $commit_msg
 EOF
-  #fi
+  fi
   
   git log --oneline -3
   
