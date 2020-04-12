@@ -57,8 +57,8 @@ fi
 test $? -eq 0 || exit 1
 
 # clone and configure the catalog Git repository
-git clone "https://brudicloud:${TOKEN}@${REPO}" catalog
-cd catalog
+git clone "https://brudicloud:${TOKEN}@${REPO}" $install_folder/tmp_catalog
+cd $install_folder/tmp_catalog
 git checkout ${REF}
 git config --local user.email cloud@brudi.com
 git config --local user.name Mesh
@@ -103,11 +103,12 @@ EOF
 git push origin ${REF}
 
 # remove catalog
-rm -r catalog
+rm -r $install_folder/tmp_catalog
 
 # commit and push workspace changes
 if [ "$PUSH" = true ]; then
   cd $install_folder
+  git pull origin next
   git config --local user.email cloud@brudi.com
   git config --local user.name Mesh
 
