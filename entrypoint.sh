@@ -63,7 +63,7 @@ test $? -eq 0 || exit 1
 git clone "https://brudicloud:${TOKEN}@${REPO}" $install_folder/tmp_catalog
 cd $install_folder/tmp_catalog
 git checkout ${REF}
-git config --local user.email cloud@brudi.com
+git config --local user.email cloud@brudi.io
 git config --local user.name Mesh
 
 # configure path to app configuration
@@ -111,7 +111,7 @@ rm -r $install_folder/tmp_catalog
 # commit and push workspace changes
 cd $install_folder
 git pull origin next
-git config --local user.email cloud@brudi.com
+git config --local user.email cloud@brudi.io
 git config --local user.name Mesh
 
 git add .
@@ -136,9 +136,8 @@ fi
 # merge workspace branch
 if [ ! -z "$MERGE" ]; then
   cd $GITHUB_WORKSPACE
-    git checkout $MERGE
-    git merge master
-    git push origin $MERGE
-    git checkout next
-  cd
+  git checkout $MERGE
+  git merge master
+  git push origin $MERGE
+  git checkout next
 fi
