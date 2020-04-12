@@ -32,8 +32,8 @@ fi
 git clone "https://brudicloud:${TOKEN}@${REPO}" catalog
 cd catalog
 git checkout ${REF}
-git config --local user.email cloud@brudi.com
-git config --local user.name Mesh
+git config --global user.email cloud@brudi.com
+git config --global user.name Mesh
 
 # configure path to app configuration
 if [ -z "$REPO_PATH" ]; then
