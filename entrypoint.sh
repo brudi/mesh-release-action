@@ -137,7 +137,8 @@ fi
 if [ ! -z "$MERGE" ]; then
   cd $GITHUB_WORKSPACE
     git checkout $MERGE
-    git merge next
+    git merge master
     git push origin $MERGE
+    git checkout next
   cd
 fi
