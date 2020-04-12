@@ -40,99 +40,96 @@ else
 fi
 
 # edit image tags
-pushd $kustom_folder
-  if [ ! -z "$IMAGES" ]; then
-    if [ -z "$IMAGE_BASE" ]; then
-      echo "ERROR: define the 'imageBase' when using 'images'!"
-      exit 1
-    fi
-    echo "editing $IMAGES with base $IMAGE_BASE"
-    edit_all_images $IMAGE_BASE $IMAGES $VERSION
-  elif [ ! -z "$IMAGE" ]; then
-    edit_image_tag $IMAGE $VERSION
-  else
-    echo "ERROR: one of 'image' or 'images' must be defined"
+cd $kustom_folder
+if [ ! -z "$IMAGES" ]; then
+  if [ -z "$IMAGE_BASE" ]; then
+    echo "ERROR: define the 'imageBase' when using 'images'!"
     exit 1
   fi
-  test $? -eq 0 || exit 1
-popd
+  echo "editing $IMAGES with base $IMAGE_BASE"
+  edit_all_images $IMAGE_BASE $IMAGES $VERSION
+elif [ ! -z "$IMAGE" ]; then
+  edit_image_tag $IMAGE $VERSION
+else
+  echo "ERROR: one of 'image' or 'images' must be defined"
+  exit 1
+fi
+test $? -eq 0 || exit 1
+
+ls -l $action_root
 
 # clone and configure the catalog Git repository
-pushd $action_root/catalog
-  git clone "https://brudicloud:${TOKEN}@${REPO}" catalog
-  git checkout ${REF}
-  git config --local user.email cloud@brudi.com
-  git config --local user.name Mesh
+cd $action_root/catalog
+git clone "https://brudicloud:${TOKEN}@${REPO}" catalog
+git checkout ${REF}
+git config --local user.email cloud@brudi.com
+git config --local user.name Mesh
 
-  # configure path to app configuration
-  if [ -z "$REPO_PATH" ]; then
-    # mesh convention: expect apps in 'apps' folder
-    REPO_PATH="apps/${APP}"
+# configure path to app configuration
+if [ -z "$REPO_PATH" ]; then
+  # mesh convention: expect apps in 'apps' folder
+  REPO_PATH="apps/${APP}"
 
-    if [[ ! -d "$REPO_PATH" ]] && [ "$is_fallback_app_name" = true ]; then # when using fallback app name but the 'apps' folder
-      # does not exist, we fallback to the 'base' directory.
-      #
-      # The app is now only used in the commit message.
-      REPO_PATH='base'
-    fi
+  if [[ ! -d "$REPO_PATH" ]] && [ "$is_fallback_app_name" = true ]; then # when using fallback app name but the 'apps' folder
+    # does not exist, we fallback to the 'base' directory.
+    #
+    # The app is now only used in the commit message.
+    REPO_PATH='base'
   fi
+fi
 
-  echo "release Mesh app '$APP' ($VERSION) in $REPO"
-  echo "-> $commit_msg"
-  # create app config directory if it doesn't exist yet
-  if [[ ! -d "$REPO_PATH" ]]; then
-    mkdir -p $REPO_PATH
-  fi
+echo "release Mesh app '$APP' ($VERSION) in $REPO"
+echo "-> $commit_msg"
+# create app config directory if it doesn't exist yet
+if [[ ! -d "$REPO_PATH" ]]; then
+  mkdir -p $REPO_PATH
+fi
 
 
-  # sync all overlays to catalog app
-  if [[ -d "$GITHUB_WORKSPACE/install" ]]; then
-    echo "syncing from apps install folder"
-    rsync -av $GITHUB_WORKSPACE/install/base $REPO_PATH/
-    rsync -av $GITHUB_WORKSPACE/install/overlays/$OVERLAY $REPO_PATH/overlays/ 2>/dev/null
-  fi
+# sync all overlays to catalog app
+if [[ -d "$GITHUB_WORKSPACE/install" ]]; then
+  echo "syncing from apps install folder"
+  rsync -av $GITHUB_WORKSPACE/install/base $REPO_PATH/
+  rsync -av $GITHUB_WORKSPACE/install/overlays/$OVERLAY $REPO_PATH/overlays/ 2>/dev/null
+fi
 
-  # commit changes to catalog app
-  git add $REPO_PATH
-  git commit -F- <<EOF
+# commit changes to catalog app
+git add $REPO_PATH
+git commit -F- <<EOF
 release($APP): upgrade to $VERSION on $REF
 
 $commit_msg
 EOF
 
-  # push catalog
-  git push origin ${REF}
-popd
+# push catalog
+git push origin ${REF}
 
 # commit and push workspace changes
 if [ "$PUSH" = true ]; then
-  
-  pushd $install_folder
-    git config --local user.email cloud@brudi.com
-    git config --local user.name Mesh
+  cd $install_folder
+  git config --local user.email cloud@brudi.com
+  git config --local user.name Mesh
 
-    git add .
-    
-    if [ "$AMEND" = true ]; then
-      git commit --amend --no-edit --no-verify
-    else
-      git commit -F- <<EOF
+  git add .
+  
+  if [ "$AMEND" = true ]; then
+    git commit --amend --no-edit --no-verify
+  else
+    git commit -F- <<EOF
 chore($APP): release $VERSION
 
 $commit_msg
 EOF
-    fi
+  fi
   
-    # push the workspace repo itself
-    git push origin HEAD
-
-  popd
+  # push the workspace repo itself
+  git push origin next
 
   if [ ! -z "$MERGE" ]; then
-    pushd $GITHUB_WORKSPACE
+    cd $GITHUB_WORKSPACE
       git checkout $MERGE
       git merge next
       git push origin $MERGE
-    popd
+    cd
   fi
 fi
