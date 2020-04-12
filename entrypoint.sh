@@ -14,7 +14,7 @@ IMAGES=${9}
 OVERLAY=${10}
 PUSH=${11-false}
 AMEND=${12-false}
-OVERLAY=${13}
+MERGE=${13}
 
 commit_msg=$(git log -1 --pretty=%B)
 action_root=$(pwd)
