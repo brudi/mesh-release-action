@@ -18,7 +18,7 @@ MERGE=${13}
 
 commit_msg=$(git log -1 --pretty=%B)
 action_root=$(pwd)
-install_folder=$GITHUB_WORKSPACE/install
+install_folder=$action_root/install
 kustom_folder=""
 
 is_fallback_app_name=false
@@ -56,11 +56,9 @@ else
 fi
 test $? -eq 0 || exit 1
 
-ls -l $action_root
-
 # clone and configure the catalog Git repository
-cd $action_root/catalog
 git clone "https://brudicloud:${TOKEN}@${REPO}" catalog
+cd catalog
 git checkout ${REF}
 git config --local user.email cloud@brudi.com
 git config --local user.name Mesh
@@ -87,10 +85,10 @@ fi
 
 
 # sync all overlays to catalog app
-if [[ -d "$GITHUB_WORKSPACE/install" ]]; then
+if [[ -d "$install_folder" ]]; then
   echo "syncing from apps install folder"
-  rsync -av $GITHUB_WORKSPACE/install/base $REPO_PATH/
-  rsync -av $GITHUB_WORKSPACE/install/overlays/$OVERLAY $REPO_PATH/overlays/ 2>/dev/null
+  rsync -av $install_folder/base $REPO_PATH/
+  rsync -av $install_folder/overlays/$OVERLAY $REPO_PATH/overlays/ 2>/dev/null
 fi
 
 # commit changes to catalog app
@@ -103,6 +101,9 @@ EOF
 
 # push catalog
 git push origin ${REF}
+
+# remove catalog
+rm -r catalog
 
 # commit and push workspace changes
 if [ "$PUSH" = true ]; then
