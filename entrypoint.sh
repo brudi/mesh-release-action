@@ -114,16 +114,17 @@ if [ "$PUSH" = true ]; then
 
   git add .
   
-  if [ "$AMEND" = true ]; then
-    git commit --amend --no-edit --no-verify
-  else
+  #if [ "$AMEND" = true ]; then
+  #  git commit --amend --no-edit --no-verify
+  #else
     git commit -F- <<EOF
 chore($APP): release $VERSION
 
 $commit_msg
 EOF
-  fi
+  #fi
   
+  git log --oneline -3
   # push the workspace repo itself
   git push origin next
 
