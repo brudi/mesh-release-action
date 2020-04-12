@@ -125,6 +125,7 @@ EOF
   #fi
   
   git log --oneline -3
+  
   # push the workspace repo itself
   git push origin next
 
