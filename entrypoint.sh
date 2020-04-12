@@ -109,35 +109,35 @@ git push origin ${REF}
 rm -r $install_folder/tmp_catalog
 
 # commit and push workspace changes
-if [ "$PUSH" = true ]; then
-  cd $install_folder
-  git pull origin next
-  git config --local user.email cloud@brudi.com
-  git config --local user.name Mesh
+cd $install_folder
+git pull origin next
+git config --local user.email cloud@brudi.com
+git config --local user.name Mesh
 
-  git add .
+git add .
 
-  num_ahead=$(git rev-list --count next...origin/next)
-  if [ "$AMEND" = true ] && [ $num_ahead -gt 0 ]; then 
-    git commit --amend --no-edit --no-verify
-  else
-    git commit -F- <<EOF
+num_ahead=$(git rev-list --count next...origin/next)
+if [ "$AMEND" = true ] && [ $num_ahead -gt 0 ]; then 
+  git commit --amend --no-edit --no-verify
+else
+  git commit -F- <<EOF
 chore($APP): release $VERSION
 
 $commit_msg
 EOF
-  fi
+fi
   
+# push the workspace repo itself
+if [ "$PUSH" = true ]; then
   git log --oneline -3
-  
-  # push the workspace repo itself
   git push origin next
+fi
 
-  if [ ! -z "$MERGE" ]; then
-    cd $GITHUB_WORKSPACE
-      git checkout $MERGE
-      git merge next
-      git push origin $MERGE
-    cd
-  fi
+# merge workspace branch
+if [ ! -z "$MERGE" ]; then
+  cd $GITHUB_WORKSPACE
+    git checkout $MERGE
+    git merge next
+    git push origin $MERGE
+  cd
 fi
