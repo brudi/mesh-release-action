@@ -33,10 +33,10 @@ fi
 # set desired app kustomization directory
 if [ ! -z "$OVERLAY" ]; then
   echo "editing overlay kustomization at overlays/$OVERLAY"
-  kustom_folder = $install_folder/overlays/$OVERLAY
+  kustom_folder=$install_folder/overlays/$OVERLAY
 else
   echo "editing base kustomization"
-  kustom_folder = $install_folder/base
+  kustom_folder=$install_folder/base
 fi
 
 # edit image tags
