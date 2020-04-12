@@ -19,7 +19,7 @@ MERGE=${13}
 commit_msg=$(git log -1 --pretty=%B)
 action_root=$(pwd)
 install_folder=$action_root/install
-kustom_folder=""
+kustomize_folder=$install_folder/base
 
 is_fallback_app_name=false
 
@@ -32,15 +32,18 @@ fi
 
 # set desired app kustomization directory
 if [ ! -z "$OVERLAY" ]; then
-  echo "editing overlay kustomization at overlays/$OVERLAY"
-  kustom_folder=$install_folder/overlays/$OVERLAY
+  if [ "$OVERLAY" = "prod" ]; then
+    echo "overwrite base images for production overlay upgrade"
+  else
+    echo "editing images in kustomization at overlays/$OVERLAY"
+    kustomize_folder=$install_folder/overlays/$OVERLAY
+  fi
 else
-  echo "editing base kustomization"
-  kustom_folder=$install_folder/base
+  echo "editing images in base kustomization"
 fi
 
 # edit image tags
-cd $kustom_folder
+cd $kustomize_folder
 if [ ! -z "$IMAGES" ]; then
   if [ -z "$IMAGE_BASE" ]; then
     echo "ERROR: define the 'imageBase' when using 'images'!"
