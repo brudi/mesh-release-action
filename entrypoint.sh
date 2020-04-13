@@ -108,36 +108,36 @@ git push origin ${REF}
 # remove catalog
 rm -r $install_folder/tmp_catalog
 
-# commit and push workspace changes
-cd $install_folder
-git pull origin next
-git config --local user.email cloud@brudi.io
-git config --local user.name Mesh
+if [ "$AMEND" = true ] || [ "$PUSH" = true ]; then 
+  # commit and push workspace changes
+  cd $install_folder
+  ws_branch=$(git symbolic-ref --short HEAD)
+  
+  git add .
 
-git add .
-
-num_ahead=$(git rev-list --count next...origin/next)
-if [ "$AMEND" = true ] && [ $num_ahead -gt 0 ]; then 
-  git commit --amend --no-edit --no-verify
-else
-  git commit -F- <<EOF
+  num_ahead=$(git rev-list --count $ws_branch...origin/$ws_branch)
+  if [ "$AMEND" = true ] && [ $num_ahead -gt 0 ]; then 
+    git commit --amend --no-edit --no-verify
+  else
+    git commit -F- <<EOF
 chore($APP): release $VERSION
 
 $commit_msg
 EOF
-fi
-  
-# push the workspace repo itself
-if [ "$PUSH" = true ]; then
-  git log --oneline -3
-  git push origin next
+  fi
+    
+  # push the workspace repo itself
+  if [ "$PUSH" = true ]; then
+    git log --oneline -3
+    git push origin $ws_branch
+  fi
 fi
 
 # merge workspace branch
 if [ ! -z "$MERGE" ]; then
   cd $GITHUB_WORKSPACE
   git checkout $MERGE
-  git merge master
+  git merge $ws_branch
   git push origin $MERGE
-  git checkout next
+  git checkout $ws_branch
 fi
