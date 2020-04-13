@@ -12,8 +12,9 @@ IMAGE=${7}
 IMAGE_BASE=${8}
 IMAGES=${9}
 OVERLAY=${10}
-PUSH=${11-false}
-AMEND=${12-false}
+COMMIT=${11:-true}
+AMEND=${12:false}
+PUSH=${13:-false}
 MERGE=${13}
 
 commit_msg=$(git log -1 --pretty=%B)
@@ -108,7 +109,7 @@ git push origin ${REF}
 # remove catalog
 rm -r $install_folder/tmp_catalog
 
-if [ "$AMEND" = true ] || [ "$PUSH" = true ]; then 
+if [  "$COMMIT" = true ] || "$AMEND" = true ] || [ "$PUSH" = true ]; then 
   # commit and push workspace changes
   cd $install_folder
   ws_branch=$(git symbolic-ref --short HEAD)
