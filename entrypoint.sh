@@ -13,7 +13,7 @@ IMAGE_BASE=${8}
 IMAGES=${9}
 OVERLAY=${10}
 COMMIT=${11:-true}
-AMEND=${12:false}
+AMEND=${12-:false}
 PUSH=${13:-false}
 MERGE=${13}
 
@@ -114,6 +114,9 @@ if [  "$COMMIT" = true ] || "$AMEND" = true ] || [ "$PUSH" = true ]; then
   cd $install_folder
   ws_branch=$(git symbolic-ref --short HEAD)
   
+  git config --local user.email cloud@brudi.com
+  git config --local user.name Mesh
+
   git add .
 
   num_ahead=$(git rev-list --count $ws_branch...origin/$ws_branch)
