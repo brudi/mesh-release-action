@@ -8,5 +8,6 @@ RUN mv kustomize /usr/local/bin/kustomize
 
 COPY entrypoint.sh /entrypoint.sh
 COPY edit.sh /edit.sh
+COPY utils.sh /edit.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
