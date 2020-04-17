@@ -47,7 +47,7 @@ echo "Commit app changes?: ${COMMIT}"
 echo "Amend commit?: ${AMMEND}"
 echo "Push app changes?: ${PUSH}"
 echo "Merge release commit to: ${MERGE}"
-printf "\n----------------------------------------\n\n"
+printf "----------------------------------------\n\n"
 
 
 printf "\n------------ Kustomization -------------\n"
@@ -67,7 +67,7 @@ else
   exit 1
 fi
 test $? -eq 0 || exit 1
-printf "\n----------------------------------------\n\n"
+printf "----------------------------------------\n\n"
 
 
 printf "\n----------- Synchronization ------------\n"
@@ -102,15 +102,15 @@ if [[ ! -d "$REPO_PATH" ]]; then
   mkdir -p $REPO_PATH
 fi
 
-printf "\nUpdate app config for '$APP' ($VERSION) in $REPO at $REPO_PATH:\n---\n$commit_msg\n---"
+printf "\nUpdate app config for '$APP' ($VERSION) in $REPO at $REPO_PATH:\n---\n$commit_msg\n---\n"
 
 # sync all overlays to catalog app
 if [[ -d "$install_folder" ]]; then
-  echo "syncing from apps install folder at $install_folder"
-  rsync -av $install_folder/base $REPO_PATH/
-  rsync -av $install_folder/overlays/$OVERLAY $REPO_PATH/overlays/ 2>/dev/null
+  echo "Sync from install folder at $install_folder to $REPO_PATH"
+  rsync -a $install_folder/base $REPO_PATH/
+  rsync -a $install_folder/overlays/$OVERLAY $REPO_PATH/overlays/ 2>/dev/null
 fi
-printf "\n----------------------------------------\n\n"
+printf "----------------------------------------\n\n"
 
 
 printf "\n------------- Release App --------------\n"
@@ -129,7 +129,7 @@ git push origin ${REF}
 
 # remove catalog
 rm -r $action_root/tmp_catalog
-printf "\n----------------------------------------\n\n"
+printf "----------------------------------------\n\n"
 
 
 printf "\n------- Commit Release Changes ---------\n"
@@ -163,11 +163,14 @@ EOF
     git push origin $ws_branch
   fi
 fi
-printf "\n----------------------------------------\n\n"
+else
+  echo "Commit & push of release changes is disabled"
+fi
+printf "----------------------------------------\n\n"
 
 
-printf "\n------------ Merge Release -------------\n"
 # merge workspace branch
+printf "\n------------ Merge Release -------------\n"
 if [ ! -z "$MERGE" ]; then
   echo "Merge $ws_branch into $MERGE in $action_root"
   cd $action_root
@@ -176,4 +179,7 @@ if [ ! -z "$MERGE" ]; then
   git push origin $MERGE
   git checkout $ws_branch
 fi
-printf "\n----------------------------------------\n\n"
+else
+  echo "Merge of release changes is disabled"
+fi
+printf "----------------------------------------\n\n"
