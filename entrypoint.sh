@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# shellcheck source=utils.sh
+. $(dirname "$0")/utils.sh
 # shellcheck source=edit.sh
 . $(dirname "$0")/edit.sh
 
@@ -25,7 +27,6 @@ install_folder=$action_root/install
 kustomize_folder=$install_folder/base
 
 is_fallback_app_name=false
-
 # default app name
 if [ -z "$APP" ]; then
   is_fallback_app_name=true
@@ -40,18 +41,19 @@ if [ ! -z "$OVERLAY" ]; then
   fi
 fi
 
-printf "\n------------ Configuration -------------\n"
-echo "App: $APP"
-echo "Version: $VERSION"
-echo "Repository: $REPO on $REF in $REPO_PATH"
-echo "Overlay: $OVERLAY"
-echo "Commit app changes?: $COMMIT"
-echo "Amend commit: $AMMEND"
-echo "Push app changes: $PUSH"
-echo "Merge release commit to: $MERGE"
-printf "----------------------------------------\n\n"
+startsection "Configuration"
+printprop "App" "$APP"
+printprop "Version" "$VERSION"
+printprop "Repository" "$REPO on $REF"
+printprop "Path" "$REPO_PATH"
+printprop "Overlay" "$OVERLAY"
+printprop "Commit" "$COMMIT"
+printprop "Amend" "$AMMEND"
+printprop "Push" "$PUSH"
+printprop "Merge" "$MERGE"
+endsection
 
-printf "------------ Kustomization -------------\n"
+startsection "Kustomization"
 echo "Kustomize image versions in $kustomize_folder"
 cd "$kustomize_folder" || exit 1
 if [ ! -z "$IMAGES" ]; then
@@ -68,9 +70,9 @@ else
   exit 1
 fi
 test $? -eq 0 || exit 1
-printf "----------------------------------------\n\n"
+endsection
 
-printf "----------- Synchronization ------------\n"
+startsection "Synchronization"
 echo "Synchronize to $REPO on $REF"
 
 # clone and configure the catalog Git repository
@@ -111,9 +113,9 @@ if [[ -d "$install_folder" ]]; then
   rsync -a "$install_folder/overlays/$OVERLAY" "$REPO_PATH/overlays/"
   test $? -eq 0 || exit 1
 fi
-printf "----------------------------------------\n\n"
+endsection
 
-printf "------------- Release App --------------\n"
+startsection "Release App"
 # commit changes to catalog app
 echo "commit catalog changes in $REPO_PATH on $REF"
 git add $REPO_PATH
@@ -130,9 +132,9 @@ test $? -eq 0 || exit 1
 
 # remove catalog
 rm -r "$action_root/tmp_catalog"
-printf "----------------------------------------\n\n"
+endsection
 
-printf "------- Commit Release Changes ---------\n"
+startsection "Commit Release Changes"
 if [ "$COMMIT" = true ] || [ "$AMEND" = true ] || [ "$PUSH" = true ]; then
   # commit and push workspace changes
   cd "$install_folder" || exit 1
@@ -160,14 +162,15 @@ EOF
   if [ "$PUSH" = true ]; then
     echo "push app changes to $ws_branch"
     git push origin "$ws_branch"
+    test $? -eq 0 || exit 1
   fi
 else
   echo "Commit & push of release changes is disabled"
 fi
-printf "----------------------------------------\n\n"
+endsection
 
 # merge workspace branch
-printf "------------ Merge Release -------------\n"
+startsection "Merge Release"
 if [ -n "$MERGE" ]; then
   echo "Merge $ws_branch into $MERGE in $action_root"
   cd "$action_root" || exit 1
@@ -178,4 +181,4 @@ if [ -n "$MERGE" ]; then
 else
   echo "Merge of release changes is disabled"
 fi
-printf "----------------------------------------"
+endsection
