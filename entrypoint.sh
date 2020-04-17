@@ -20,6 +20,7 @@ MERGE=${13}
 
 commit_msg=$(git log -1 --pretty=%B)
 action_root=$(pwd)
+catalog_dir=$action_root/tmp_catalog
 install_folder=$action_root/install
 kustomize_folder=$install_folder/base
 
@@ -45,17 +46,17 @@ echo "Version: $VERSION"
 echo "Repository: $REPO on $REF in $REPO_PATH"
 echo "Overlay: $OVERLAY"
 echo "Commit app changes?: $COMMIT"
-echo "Amend commit?: $AMMEND"
-echo "Push app changes?: $PUSH"
+echo "Amend commit: $AMMEND"
+echo "Push app changes: $PUSH"
 echo "Merge release commit to: $MERGE"
-printf "\n----------------------------------------\n"
+printf "----------------------------------------\n\n"
 
-printf "\n------------ Kustomization -------------\n"
+printf "------------ Kustomization -------------\n"
 echo "Kustomize image versions in $kustomize_folder"
 cd "$kustomize_folder" || exit 1
 if [ ! -z "$IMAGES" ]; then
   if [ -z "$IMAGE_BASE" ]; then
-    echo "ERROR: define the 'imageBase' when using 'images'!"
+    echo "ERROR: missing 'imageBase' when using 'images'!"
     exit 1
   fi
   echo "Set image tage to $VERSION for $IMAGES with base $IMAGE_BASE"
@@ -67,14 +68,14 @@ else
   exit 1
 fi
 test $? -eq 0 || exit 1
-printf "\n----------------------------------------\n"
+printf "----------------------------------------\n\n"
 
-printf "\n----------- Synchronization ------------\n"
+printf "----------- Synchronization ------------\n"
 echo "Synchronize to $REPO on $REF"
 
 # clone and configure the catalog Git repository
-git clone "https://brudicloud:${TOKEN}@${REPO}" "$action_root/tmp_catalog"
-cd "$action_root/tmp_catalog" || exit 1
+git clone "https://brudicloud:${TOKEN}@${REPO}" "$catalog_dir"
+cd "$catalog_dir" || exit 1
 
 # configure git user
 git config --local user.email cloud@brudi.io
@@ -105,13 +106,14 @@ printf "\nUpdate app config for '%s' (%s) in %s at %s:\n---\n%s\n---\n" "$APP" "
 
 # sync all overlays to catalog app
 if [[ -d "$install_folder" ]]; then
-  echo "Sync from install folder at $install_folder to $REPO_PATH"
+  echo "Sync from install folder at $install_folder to $catalog_dir/$REPO_PATH"
   rsync -a "$install_folder/base" "$REPO_PATH/"
-  rsync -a "$install_folder/overlays/$OVERLAY" "$REPO_PATH/overlays/" 2>/dev/null
+  rsync -a "$install_folder/overlays/$OVERLAY" "$REPO_PATH/overlays/"
+  test $? -eq 0 || exit 1
 fi
-printf "\n----------------------------------------\n"
+printf "----------------------------------------\n\n"
 
-printf "\n------------- Release App --------------\n"
+printf "------------- Release App --------------\n"
 # commit changes to catalog app
 echo "commit catalog changes in $REPO_PATH on $REF"
 git add $REPO_PATH
@@ -124,12 +126,13 @@ EOF
 # push catalog
 echo "push catalog changes to $REF"
 git push origin "$REF"
+test $? -eq 0 || exit 1
 
 # remove catalog
 rm -r "$action_root/tmp_catalog"
-printf "\n----------------------------------------\n"
+printf "----------------------------------------\n\n"
 
-printf "\n------- Commit Release Changes ---------\n"
+printf "------- Commit Release Changes ---------\n"
 if [ "$COMMIT" = true ] || [ "$AMEND" = true ] || [ "$PUSH" = true ]; then
   # commit and push workspace changes
   cd "$install_folder" || exit 1
@@ -161,10 +164,10 @@ EOF
 else
   echo "Commit & push of release changes is disabled"
 fi
-printf "\n----------------------------------------\n"
+printf "----------------------------------------\n\n"
 
 # merge workspace branch
-printf "\n------------ Merge Release -------------\n"
+printf "------------ Merge Release -------------\n"
 if [ -n "$MERGE" ]; then
   echo "Merge $ws_branch into $MERGE in $action_root"
   cd "$action_root" || exit 1
@@ -175,4 +178,4 @@ if [ -n "$MERGE" ]; then
 else
   echo "Merge of release changes is disabled"
 fi
-printf "\n----------------------------------------\n"
+printf "----------------------------------------"
