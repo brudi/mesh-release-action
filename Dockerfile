@@ -1,6 +1,6 @@
 FROM alpine:3.10
 
-RUN apk --no-cache add rsync git curl bash ncurses
+RUN apk --no-cache add rsync git curl bash
 
 RUN curl -s "https://raw.githubusercontent.com/\
 kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
