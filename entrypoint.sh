@@ -33,24 +33,32 @@ fi
 
 # set desired app kustomization directory
 if [ ! -z "$OVERLAY" ]; then
-  if [ "$OVERLAY" = "prod" ]; then
-    echo "overwrite base images for production overlay upgrade"
-  else
-    echo "editing images in kustomization at overlays/$OVERLAY"
+  if [ "$OVERLAY" != "prod" ]; then
     kustomize_folder=$install_folder/overlays/$OVERLAY
   fi
-else
-  echo "editing images in base kustomization"
 fi
 
-# edit image tags
+printf "\n------------ Configuration -------------\n"
+echo "App: ${APP}"
+echo "Version: ${VERSION}"
+echo "Repository: ${REPO} on ${REF} in ${REPO_PATH}"
+echo "Overlay: ${OVERLAY}"
+echo "Commit app changes?: ${COMMIT}"
+echo "Amend commit?: ${AMMEND}"
+echo "Push app changes?: ${PUSH}"
+echo "Merge release commit to: ${MERGE}"
+printf "\n----------------------------------------\n\n"
+
+
+printf "\n------------ Kustomization -------------\n"
+echo "Kustomize image versions in ${kustomize_folder}"
 cd $kustomize_folder
 if [ ! -z "$IMAGES" ]; then
   if [ -z "$IMAGE_BASE" ]; then
     echo "ERROR: define the 'imageBase' when using 'images'!"
     exit 1
   fi
-  echo "editing $IMAGES with base $IMAGE_BASE"
+  echo "Set image tage to $VERSION for $IMAGES with base $IMAGE_BASE"
   edit_all_images $IMAGE_BASE $IMAGES $VERSION
 elif [ ! -z "$IMAGE" ]; then
   edit_image_tag $IMAGE $VERSION
@@ -59,13 +67,22 @@ else
   exit 1
 fi
 test $? -eq 0 || exit 1
+printf "\n----------------------------------------\n\n"
+
+
+printf "\n----------- Synchronization ------------\n"
+echo "Synchronize to ${REPO} on ${REF}"
 
 # clone and configure the catalog Git repository
-git clone "https://brudicloud:${TOKEN}@${REPO}" $install_folder/tmp_catalog
-cd $install_folder/tmp_catalog
-git checkout ${REF}
+git clone "https://brudicloud:${TOKEN}@${REPO}" $action_root/tmp_catalog
+cd $action_root/tmp_catalog
+
+# configure git user
 git config --local user.email cloud@brudi.io
 git config --local user.name Mesh
+
+# checkout releae branch of catalog
+git checkout ${REF}
 
 # configure path to app configuration
 if [ -z "$REPO_PATH" ]; then
@@ -80,22 +97,25 @@ if [ -z "$REPO_PATH" ]; then
   fi
 fi
 
-echo "release Mesh app '$APP' ($VERSION) in $REPO"
-echo "-> $commit_msg"
 # create app config directory if it doesn't exist yet
 if [[ ! -d "$REPO_PATH" ]]; then
   mkdir -p $REPO_PATH
 fi
 
+printf "\nUpdate app config for '$APP' ($VERSION) in $REPO at $REPO_PATH:\n---\n$commit_msg\n---"
 
 # sync all overlays to catalog app
 if [[ -d "$install_folder" ]]; then
-  echo "syncing from apps install folder"
+  echo "syncing from apps install folder at $install_folder"
   rsync -av $install_folder/base $REPO_PATH/
   rsync -av $install_folder/overlays/$OVERLAY $REPO_PATH/overlays/ 2>/dev/null
 fi
+printf "\n----------------------------------------\n\n"
 
+
+printf "\n------------- Release App --------------\n"
 # commit changes to catalog app
+echo "commit catalog changes in $REPO_PATH on $REF"
 git add $REPO_PATH
 git commit -F- <<EOF
 release($APP): upgrade to $VERSION on $REF
@@ -104,11 +124,15 @@ $commit_msg
 EOF
 
 # push catalog
+echo "push catalog changes to $ws_branch"
 git push origin ${REF}
 
 # remove catalog
-rm -r $install_folder/tmp_catalog
+rm -r $action_root/tmp_catalog
+printf "\n----------------------------------------\n\n"
 
+
+printf "\n------- Commit Release Changes ---------\n"
 if [  "$COMMIT" = true ] || "$AMEND" = true ] || [ "$PUSH" = true ]; then 
   # commit and push workspace changes
   cd $install_folder
@@ -117,12 +141,15 @@ if [  "$COMMIT" = true ] || "$AMEND" = true ] || [ "$PUSH" = true ]; then
   git config --local user.email cloud@brudi.com
   git config --local user.name Mesh
 
+  echo "commit app changes in $install_folder on $ws_branch"
   git add .
 
   num_ahead=$(git rev-list --count $ws_branch...origin/$ws_branch)
   if [ "$AMEND" = true ] && [ $num_ahead -gt 0 ]; then 
+    echo "ammend release commit as requested"
     git commit --amend --no-edit --no-verify
   else
+    echo "create a new commit for this release"
     git commit -F- <<EOF
 chore($APP): release $VERSION
 
@@ -132,16 +159,21 @@ EOF
     
   # push the workspace repo itself
   if [ "$PUSH" = true ]; then
-    git log --oneline -3
+    echo "push app changes to $ws_branch"
     git push origin $ws_branch
   fi
 fi
+printf "\n----------------------------------------\n\n"
 
+
+printf "\n------------ Merge Release -------------\n"
 # merge workspace branch
 if [ ! -z "$MERGE" ]; then
-  cd $GITHUB_WORKSPACE
+  echo "Merge $ws_branch into $MERGE in $action_root"
+  cd $action_root
   git checkout $MERGE
   git merge $ws_branch
   git push origin $MERGE
   git checkout $ws_branch
 fi
+printf "\n----------------------------------------\n\n"
