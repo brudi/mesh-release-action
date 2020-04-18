@@ -109,9 +109,10 @@ printf "\nUpdate app config for '%s' (%s) in %s at %s:\n---\n%s\n---\n" "$APP" "
 # sync all overlays to catalog app
 if [[ -d "$install_folder" ]]; then
   echo "Sync from install folder at $install_folder to $catalog_dir/$REPO_PATH"
-  rsync -a "$install_folder/base" "$REPO_PATH/"
-  rsync -a "$install_folder/overlays/$OVERLAY" "$REPO_PATH/overlays/"
+  rsync -av "$install_folder/base" "$REPO_PATH/"
+  rsync -av "$install_folder/overlays/$OVERLAY" "$REPO_PATH/overlays/"
   test $? -eq 0 || exit 1
+  git status
 fi
 endsection
 
