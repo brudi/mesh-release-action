@@ -16,9 +16,9 @@ IMAGE_BASE=${8}
 IMAGES=${9}
 OVERLAY=${10}
 COMMIT=${11:-true}
-AMEND=${12-:false}
+AMEND=${12:-false}
 PUSH=${13:-false}
-MERGE=${13}
+MERGE=${14:false}
 
 commit_msg=$(git log -1 --pretty=%B)
 action_root=$(pwd)
@@ -109,10 +109,16 @@ printf "\nUpdate app config for '%s' (%s) in %s at %s:\n---\n%s\n---\n" "$APP" "
 # sync all overlays to catalog app
 if [[ -d "$install_folder" ]]; then
   echo "Sync from install folder at $install_folder to $catalog_dir/$REPO_PATH"
-  rsync -av "$install_folder/base" "$REPO_PATH/"
-  rsync -av "$install_folder/overlays/$OVERLAY" "$REPO_PATH/overlays/"
+  rsync -a "$install_folder/base" "$REPO_PATH/"
+  if [ -n "$MERGE" ]; then
+    rsync -a "$install_folder/overlays/$OVERLAY" "$REPO_PATH/overlays/"
+  fi
+  
+  # exit on sync errors
   test $? -eq 0 || exit 1
-  git status
+  
+  # list changed files
+  git status -s $install_folder
 fi
 endsection
 
