@@ -106,32 +106,34 @@ fi
 
 printf "\nUpdate app config for '%s' (%s) in %s at %s:\n---\n%s\n---\n" "$APP" "$VERSION" "$REPO" "$REPO_PATH" "$commit_msg"
 
+catalog_app="$catalog_dir/$REPO_PATH"
 # sync all overlays to catalog app
 if [[ -d "$install_folder" ]]; then
-  echo "Sync base from install folder at $install_folder to $catalog_dir/$REPO_PATH/"
+  echo "Sync base from install folder at $install_folder to $catalog_app/"
   rsync -av "$install_folder/base" "$REPO_PATH/"
   if [ -n "$OVERLAY" ]; then
-    echo "Sync overlay from install folder at $install_folder/overlays/$OVERLAY to $catalog_dir/overlays/"
-    rsync -av "$install_folder/overlays/$OVERLAY" "$catalog_dir/overlays/"
+    echo "Sync overlay from install folder at $install_folder/overlays/$OVERLAY to $catalog_app/overlays/"
+    rsync -av "$install_folder/overlays/$OVERLAY" "$catalog_app/overlays/"
   fi
   
   # exit on sync errors
   test $? -eq 0 || exit 1
   
-  ls -l $install_folder/overlays/next
-  cat $install_folder/overlays/next/kustomization.yaml
+  ls -l $install_folder/overlays/$OVERLAY
+  cat $install_folder/overlays/$OVERLAY/kustomization.yaml
   echo '++++++'
-  ls -l $REPO_PATH/overlays/next
-  cat $REPO_PATH/overlays/next/kustomization.yaml
+  ls -l $catalog_app/overlays/next
+  cat $catalog_app/overlays/next/kustomization.yaml
 
   # list changed files
-  git status -s $REPO_PATH
+  git status -s $catalog_app
 fi
 endsection
 
 startsection "Release App"
 # commit changes to catalog app
 echo "Commit catalog changes in $REPO_PATH on $REF"
+cd "#catalog_app" || exit 1
 git add .
 git commit -F- <<EOF
 release($APP): upgrade to $VERSION on $REF
@@ -145,7 +147,8 @@ git push origin "$REF"
 test $? -eq 0 || exit 1
 
 # remove catalog
-rm -r "$action_root/tmp_catalog"
+cd "$action_root"
+rm -rf "$catalog_dir"
 endsection
 
 startsection "Commit Release Changes"
