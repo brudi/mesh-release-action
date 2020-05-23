@@ -109,9 +109,9 @@ printf "\nUpdate app config for '%s' (%s) in %s at %s:\n---\n%s\n---\n" "$APP" "
 # sync all overlays to catalog app
 if [[ -d "$install_folder" ]]; then
   echo "Sync from install folder at $install_folder to $catalog_dir/$REPO_PATH"
-  rsync -av "$install_folder/base" "$REPO_PATH/"
+  rsync -a "$install_folder/base" "$REPO_PATH/"
   if [ -n "$OVERLAY" ]; then
-    rsync -av "$install_folder/overlays/$OVERLAY" "$REPO_PATH/overlays/"
+    rsync -a "$install_folder/overlays/$OVERLAY" "$REPO_PATH/overlays/"
   fi
   
   # exit on sync errors
@@ -124,8 +124,9 @@ endsection
 
 startsection "Release App"
 # commit changes to catalog app
-echo "commit catalog changes in $REPO_PATH on $REF"
-git add $REPO_PATH
+echo "Commit catalog changes in $REPO_PATH on $REF"
+cd $REPO_PATH || exit 1
+git add .
 git commit -F- <<EOF
 release($APP): upgrade to $VERSION on $REF
 
@@ -133,7 +134,7 @@ $commit_msg
 EOF
 
 # push catalog
-echo "push catalog changes to $REF"
+echo "Push catalog changes to $REF"
 git push origin "$REF"
 test $? -eq 0 || exit 1
 
@@ -150,15 +151,15 @@ if [ "$COMMIT" = true ] || [ "$AMEND" = true ] || [ "$PUSH" = true ]; then
   git config --local user.email cloud@brudi.com
   git config --local user.name Mesh
 
-  echo "commit app changes in $install_folder on $ws_branch"
+  echo "Commit app changes in $install_folder on $ws_branch"
   git add .
 
   num_ahead=$(git rev-list --count "$ws_branch...origin/$ws_branch")
   if [ "$AMEND" = true ] && [ "$num_ahead" -gt 0 ]; then
-    echo "amend release commit as requested"
+    echo "Amend release commit as requested"
     git commit --amend --no-edit --no-verify
   else
-    echo "create a new commit for this release"
+    echo "Create a new commit for this release"
     git commit -F- <<EOF
 chore($APP): release $VERSION
 
@@ -170,9 +171,11 @@ EOF
     echo "push app changes to $ws_branch"
     git push origin "$ws_branch"
     test $? -eq 0 || exit 1
+  else
+    echo "Push app changes is disabled"
   fi
 else
-  echo "Commit & push of release changes is disabled"
+  echo "Push release changes is disabled"
 fi
 endsection
 
