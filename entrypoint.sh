@@ -114,9 +114,15 @@ if [[ -d "$install_folder" ]]; then
     rsync -a "$install_folder/overlays/$OVERLAY" "$REPO_PATH/overlays/"
   fi
   
+  pwd
   # exit on sync errors
   test $? -eq 0 || exit 1
-  
+  ls .
+  ls $REPO_PATH
+  ls $REPO_PATH/overlays/
+  ls $REPO_PATH/overlays/next
+  cat $REPO_PATH/overlays/next/kustomization.yaml
+
   # list changed files
   git status -s $REPO_PATH
 fi
@@ -125,7 +131,6 @@ endsection
 startsection "Release App"
 # commit changes to catalog app
 echo "Commit catalog changes in $REPO_PATH on $REF"
-cd $REPO_PATH || exit 1
 git add .
 git commit -F- <<EOF
 release($APP): upgrade to $VERSION on $REF
