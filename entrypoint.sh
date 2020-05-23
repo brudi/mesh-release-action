@@ -110,21 +110,15 @@ catalog_app="$catalog_dir/$REPO_PATH"
 # sync all overlays to catalog app
 if [[ -d "$install_folder" ]]; then
   echo "Sync base from install folder at $install_folder to $catalog_app/"
-  rsync -av "$install_folder/base" "$REPO_PATH/"
+  rsync -a "$install_folder/base" "$REPO_PATH/"
   if [ -n "$OVERLAY" ]; then
     echo "Sync overlay from install folder at $install_folder/overlays/$OVERLAY to $catalog_app/overlays/"
-    rsync -av "$install_folder/overlays/$OVERLAY" "$catalog_app/overlays/"
+    rsync -a "$install_folder/overlays/$OVERLAY" "$catalog_app/overlays/"
   fi
   
   # exit on sync errors
   test $? -eq 0 || exit 1
   
-  ls -l $install_folder/overlays/$OVERLAY
-  cat $install_folder/overlays/$OVERLAY/kustomization.yaml
-  echo '++++++'
-  ls -l $catalog_app/overlays/next
-  cat $catalog_app/overlays/next/kustomization.yaml
-
   # list changed files
   git status -s $catalog_app
 fi
@@ -133,7 +127,7 @@ endsection
 startsection "Release App"
 # commit changes to catalog app
 echo "Commit catalog changes in $REPO_PATH on $REF"
-cd "#catalog_app" || exit 1
+cd "$catalog_app" || exit 1
 git add .
 git commit -F- <<EOF
 release($APP): upgrade to $VERSION on $REF
