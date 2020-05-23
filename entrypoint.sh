@@ -110,10 +110,10 @@ catalog_app="$catalog_dir/$REPO_PATH"
 # sync all overlays to catalog app
 if [[ -d "$install_folder" ]]; then
   echo "Sync base from install folder at $install_folder to $catalog_app/"
-  rsync -av "$install_folder/base" "$REPO_PATH/"
+  rsync -Iav "$install_folder/base" "$REPO_PATH/"
   if [ -n "$OVERLAY" ]; then
     echo "Sync overlay from install folder at $install_folder/overlays/$OVERLAY to $catalog_app/overlays/"
-    rsync -av "$install_folder/overlays/$OVERLAY" "$catalog_app/overlays/"
+    rsync -Iav "$install_folder/overlays/$OVERLAY" "$catalog_app/overlays/"
   fi
   
   # exit on sync errors
