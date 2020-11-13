@@ -115,15 +115,9 @@ if [[ -d "$install_folder" ]]; then
     echo "Sync overlay from install folder at $install_folder/overlays/$OVERLAY to $catalog_app/overlays/"
     rsync -Iav "$install_folder/overlays/$OVERLAY" "$catalog_app/overlays/"
   fi
-  
+
   # exit on sync errors
   test $? -eq 0 || exit 1
-  
-  ls -l $install_folder/overlays/$OVERLAY
-  cat $install_folder/overlays/$OVERLAY/kustomization.yaml
-  echo '++++++'
-  ls -l $catalog_app/overlays/next
-  cat $catalog_app/overlays/next/kustomization.yaml
 
   # list changed files
   git status -s $catalog_app
