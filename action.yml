@@ -11,6 +11,9 @@ inputs:
   app:
     description: 'App name (defaults to current folder name)'
     required: false
+  appFolder:
+    description: 'Relativ path to app install folder (defaults to `install`)'
+    required: false
   repo:
     description: 'App configuration repository'
     required: false
@@ -51,6 +54,7 @@ runs:
   image: 'Dockerfile'
   args:
     - ${{ inputs.app }}
+    - ${{ inputs.appFolder }}
     - ${{ inputs.version }}
     - ${{ inputs.token }}
     - ${{ inputs.repo }}

@@ -6,24 +6,25 @@
 . $(dirname "$0")/edit.sh
 
 APP=${1}
-VERSION=${2}
-TOKEN=${3}
-REPO=${4}
-REF=${5}
-REPO_PATH=${6-$APP}
-IMAGE=${7}
-IMAGE_BASE=${8}
-IMAGES=${9}
-OVERLAY=${10}
-COMMIT=${11:-true}
-AMEND=${12:-false}
-PUSH=${13:-false}
-MERGE=${14:false}
+APP_FOLDER=${2-"install"}
+VERSION=${3}
+TOKEN=${4}
+REPO=${5}
+REF=${6}
+REPO_PATH=${7-$APP}
+IMAGE=${8}
+IMAGE_BASE=${9}
+IMAGES=${10}
+OVERLAY=${11}
+COMMIT=${12:-true}
+AMEND=${13:-false}
+PUSH=${14:-false}
+MERGE=${15:false}
 
 commit_msg=$(git log -1 --pretty=%B)
 action_root=$(pwd)
 catalog_dir=$action_root/tmp_catalog
-install_folder=$action_root/install
+install_folder=$action_root/$APP_FOLDER
 kustomize_folder=$install_folder/base
 
 is_fallback_app_name=false
