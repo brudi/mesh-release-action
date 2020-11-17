@@ -6,7 +6,7 @@
 . $(dirname "$0")/edit.sh
 
 APP=${1}
-APP_FOLDER=${2-"install"}
+APP_FOLDER=${2:-install}
 VERSION=${3}
 TOKEN=${4}
 REPO=${5}
