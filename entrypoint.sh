@@ -81,8 +81,8 @@ git clone "https://brudicloud:${TOKEN}@${REPO}" "$catalog_dir"
 cd "$catalog_dir" || exit 1
 
 # configure git user
-git config --local user.email cloud@brudi.io
-git config --local user.name Mesh
+git config --local user.email brudi@brudi.com
+git config --local user.name brudi
 
 # checkout release branch of catalog
 git checkout "$REF"
@@ -152,8 +152,8 @@ if [ "$COMMIT" = true ] || [ "$AMEND" = true ] || [ "$PUSH" = true ]; then
   cd "$install_folder" || exit 1
   ws_branch=$(git symbolic-ref --short HEAD)
 
-  git config --local user.email cloud@brudi.com
-  git config --local user.name Mesh
+  git config --local user.email brudi@brudi.com
+  git config --local user.name brudi
 
   echo "Commit app changes in $install_folder on $ws_branch"
   git add .

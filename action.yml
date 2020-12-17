@@ -38,10 +38,10 @@ inputs:
     description: 'Specific overlay to release'
     required: false
   push:
-    description: 'Push the changes of the app repo itself. By default, changes are pushed to the `repo` only.'
+    description: 'Push the changes of the app repo itself. By default, changes are pushed to the catalog `repo` only.'
     required: false
   commit:
-    description: 'Commit all release changes. True by default.'
+    description: 'Commit all release changes back to the app repo itself. True by default.'
     required: false
   amend:
     description: 'Amend the app changes to the last commit. Creates a new commit by default. Only available when `push` is set to true.'
