@@ -49,7 +49,7 @@ printprop "Repository" "$REPO on $REF"
 printprop "Path" "$REPO_PATH"
 printprop "Overlay" "$OVERLAY"
 printprop "Commit" "$COMMIT"
-printprop "Amend" "$AMMEND"
+printprop "Amend" "$AMEND"
 printprop "Push" "$PUSH"
 printprop "Merge" "$MERGE"
 endsection
@@ -158,8 +158,11 @@ if [ "$COMMIT" = true ] || [ "$AMEND" = true ] || [ "$PUSH" = true ]; then
   echo "Commit app changes in $install_folder on $ws_branch"
   git add .
 
-  num_ahead=$(git rev-list --count "$ws_branch...origin/$ws_branch")
-  if [ "$AMEND" = true ] && [ "$num_ahead" -gt 0 ]; then
+  # FIXME: To prevent unintended overwritees, re-enable rev-list test to check,
+  #        whether or not an actual release commit is available already.
+  # num_ahead=$(git rev-list --count "$ws_branch...origin/$ws_branch")
+  # if [ "$AMEND" = true ] && [ "$num_ahead" -gt 0 ]; then
+  if [ "$AMEND" = true ]; then
     echo "Amend release commit as requested"
     git commit --amend --no-edit --no-verify
   else
