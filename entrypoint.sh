@@ -158,7 +158,7 @@ if [ "$COMMIT" = true ] || [ "$AMEND" = true ] || [ "$PUSH" = true ]; then
   echo "Commit app changes in $install_folder on $ws_branch"
   git add .
 
-  # FIXME: To prevent unintended overwritees, re-enable rev-list test to check,
+  # FIXME: To prevent unintended overwrites, re-enable rev-list test to check,
   #        whether or not an actual release commit is available already.
   # num_ahead=$(git rev-list --count "$ws_branch...origin/$ws_branch")
   # if [ "$AMEND" = true ] && [ "$num_ahead" -gt 0 ]; then
@@ -167,7 +167,7 @@ if [ "$COMMIT" = true ] || [ "$AMEND" = true ] || [ "$PUSH" = true ]; then
     git commit --amend --no-edit --no-verify
   else
     echo "Create a new commit for this release"
-    git commit -F- <<EOF
+    git commit --no-verify -F- <<EOF
 chore($APP): release $VERSION
 
 $commit_msg
